@@ -3,7 +3,7 @@
 author: Rob Williams
 contact: jayrobwilliams@gmail.com
 created: 12/05/18
-updated: 01/15/19
+updated: 07/08/19
 
 this script uses openCV to split a video into a number of by taking every
 x-th frame, defined as a user specified interval in seconds
@@ -56,18 +56,3 @@ def vid_split(file, outdir, interval):
     
     # release video connection
     cap.release()
-
-# create directory to hold processed images
-os.makedirs('proc/vid_proc', exist_ok=True)
-
-# get subdirectories in image directory, omitting hidden
-vids = [f for f in os.listdir('Videos') if not f.startswith('.')]
-
-# iterate through videos
-for i in vids:
-    
-    # split video i
-    vid_split('Videos/' + i, 'proc/vid_proc', 60)
-
-# quit script
-quit()

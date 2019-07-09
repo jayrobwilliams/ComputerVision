@@ -4,11 +4,12 @@
 author: Rob Williams
 contact: jayrobwilliams@gmail.com
 created: 01/15/19
-updated: 01/29/19
+updated: 07/09/19
 
 this script uses openCV to identify keypoints in images with SURF, save the
-RootSIFT descriptors to .csv files, and extract and save the regions of interest
-around each keypoint as images for further visual inspection
+RootSIFT descriptors to .csv files, save images with keypoints identified,
+and extract and save the regions of interest around each keypoint as images
+for further visual inspection
 """
 
 import os
@@ -78,52 +79,3 @@ def keypoint_extract(img, kpts, img_name, output_dir, px = 16):
     plt.imsave(os.path.join(output_dir, "%s_%s_kp.jpg" % (vid_prefix, img_name)),
                cv2.drawKeypoints(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), kpts,
                                  None, (0,255,0), 0))
-
-# get subdirectories in image directory, omitting hidden
-dirs = [f for f in os.listdir('proc/vid_proc') if not f.startswith('.')]
-
-# iterate through videos
-for d in dirs:
-    
-    # get create filepath for reading in video frames
-    vid_dir = os.path.join('proc/vid_proc', d)
-    
-    # create path for output files for video frames
-    out_path = os.path.join('proc/kp_proc/', d)
-    
-    # create subdirectory for saved frames
-    os.makedirs(out_path, exist_ok=True)
-    
-    # get filenames for frames in video directory
-    frames = [f for f in os.listdir(vid_dir) if not f.startswith('.')]
-    
-    # creat empty array to hold keypoint descriptors
-    desc_array = np.empty((0, 128))
-    
-    for f in frames:
-        
-        # get file name for output directory
-        file_s = f.split('.')[0]
-        
-        # read in image
-        img = cv2.imread(os.path.join(vid_dir, f))
-        
-        # detect keypoints with SURF and extract descriptors with RootSIFT
-        kpts, descs = feature_extract(img)
-        
-        # skip to next iteration if no keypoints found in frame
-        if not kpts:
-            continue
-        
-        # concatenate RootSIFT descriptors to descriptor array
-        desc_array = np.concatenate([desc_array, descs])
-        
-        # save area around each keypoint for visual labeling of clusters
-        keypoint_extract(img, kpts, file_s, out_path, px = 16)
-    
-    # save RootSIFT descriptors from keypoints
-    np.savetxt(os.path.join(out_path, "desc.csv"), desc_array,
-                  delimiter=",")
-
-# quit script
-quit()
